@@ -3,7 +3,7 @@ import Experience from "./Experience.js";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
 
-export default class Renderer {
+export default class RendererSmall {
   constructor(_options = {}) {
     this.experience = new Experience();
     this.config = this.experience.config;
@@ -16,7 +16,7 @@ export default class Renderer {
 
     // Debug
     if (this.debug) {
-      this.debugFolder = this.debug.addFolder("renderer");
+      this.debugFolder = this.debug.addFolder("rendererSmall");
     }
 
     this.usePostprocess = false;
@@ -36,11 +36,11 @@ export default class Renderer {
     // this.instance.domElement.style.position = 'absolute'
     // this.instance.domElement.style.top = 0
     // this.instance.domElement.style.left = 0
-    this.instance.domElement.style.width = "100%";
-    this.instance.domElement.style.height = "100%";
+    this.instance.domElement.style.width = "360px";
+    this.instance.domElement.style.height = "360px";
 
     this.instance.setClearColor(this.clearColor, 1);
-    this.instance.setSize(this.config.width, this.config.height);
+    this.instance.setSize(360, (this.config.height / this.config.width) * 360);
     this.instance.setPixelRatio(this.config.pixelRatio);
 
     this.instance.physicallyCorrectLights = true;
@@ -125,7 +125,7 @@ export default class Renderer {
 
   resize() {
     // Instance
-    this.instance.setSize(this.config.width, this.config.height);
+    this.instance.setSize(360, (this.config.height / this.config.width) * 360);
     this.instance.setPixelRatio(this.config.pixelRatio);
 
     // Post process
