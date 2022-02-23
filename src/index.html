@@ -13,10 +13,18 @@
         <nav class="nav-aside">
             <h4 class="navbar navbar-dark flex-md-nowrap p-0">
                 <span class="ms-2"><span class="text-secondary fw-bold">SmartHome by</span> BKAV</span>
-            </h4><hr>
+            </h4>
+            <hr>
 
             <div class="experience-small mb-4"></div>
-            
+
+            <label for="basic-url" class="form-label">Device</label>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Name of Device</span>
+                <input id="device-name" type="text" class="form-control form-control-sm" placeholder="ex: Đèn sân vườn" 
+                    aria-label="deviceName" aria-describedby="basic-addon1">
+            </div>
+
             <label for="side" class="form-label">Pick<strong> side</strong></label>
             <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
                 <div class="btn-group me-2" role="group" aria-label="Second group">
@@ -32,19 +40,26 @@
             <label for="customYAxis" class="form-label">Y axis: <strong>0.5</strong></label>
             <input type="range" class="form-range" id="customRange1">
             <label for="customZAxis" class="form-label">Z axis: <strong>0.5</strong></label>
-            <input type="range" class="form-range" id="customRange1"><hr>
+            <input type="range" class="form-range" id="customRange1">
+            <hr>
 
             <label for="size" class="form-label">Choose <strong>size</strong></label>
             <div class="input-group mb-5">
-                <input type="number" class="form-control" placeholder="Width" aria-label="Width">
+                <input type="number" class="form-control form-control-sm" placeholder="Width" aria-label="Width">
                 <span class="input-group-text">@</span>
-                <input type="number" class="form-control" placeholder="Height" aria-label="Height">
+                <input type="number" class="form-control form-control-sm" placeholder="Height" aria-label="Height">
                 <span class="input-group-text">@</span>
-                <input type="number" class="form-control" placeholder="Depth" aria-label="Depth">
+                <input type="number" class="form-control form-control-sm" placeholder="Depth" aria-label="Depth">
             </div>
-
-            <div class="col-md-12 col-lg-12">
-                <button class="w-60 btn btn-primary btn-lg" type="submit">Continue to checkout</button>
+            <div class="input-group mb-5">
+                <span class="input-group-text">XML for device</span>
+                <input id="result" type="text" class="form-control form-control-sm" placeholder="" aria-label="Result">
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-8">
+                    <button type="button" class="btn btn-secondary">Reset state</button>
+                    <button type="button" class="btn btn-primary">Register box</button>
+                </div>
             </div>
         </nav>
     </div>
