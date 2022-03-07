@@ -8,7 +8,9 @@ export default class World {
     this.config = this.experience.config;
     this.scene = this.experience.scene;
     this.resources = this.experience.resources;
-
+    this.spotLight = new THREE.SpotLight( 0xffffff, 1 );
+    this.lightHelper = new THREE.SpotLightHelper( this.spotLight );
+    this.shadowCameraHelper = new THREE.CameraHelper( this.spotLight.shadow.camera );
     this.resources.on("groupEnd", (_group) => {
       if (_group.name === "base") {
         this.setDummy();
@@ -17,7 +19,10 @@ export default class World {
   }
 
   setDummy() {
-    //
+    this.resources.items.lennaTexture.encoding = THREE.sRGBEncoding;
+    // this.resources.items.houseTexture.encoding = THREE.sRGBEncoding
+
+    // binding to gui
     this.controlObject = {
       enable: false,
       side: 0, 
@@ -26,114 +31,81 @@ export default class World {
       depth: 1
     };
 
-    // tapMesh
-    this.tapMesh = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      // new THREE.MeshBasicMaterial({ map: this.resources.items.lennaTexture }) // Load texture on Mesh
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
-    );
-    // enable transparency
-    this.tapMesh.material.transparent = true;
-    // set opacity to 50%
-    this.tapMesh.material.opacity = 0.5; 
-    this.tapMesh.position.set(0, 0, 6);
-    this.scene.add(this.tapMesh);
-  
 
-    this.resources.items.lennaTexture.encoding = THREE.sRGBEncoding;
-    this.resources.items.houseTexture.encoding = THREE.sRGBEncoding
 
-    // cube mesh
-    const cube1 = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshBasicMaterial({ color: 0x1f75ff })
-    );
-    // this.scene.add(cube1);
 
-    // house model
-    this.resources.items.houseTexture.scene.scale.set(0.1, 0.1, 0.1)
-    this.scene.add(this.resources.items.houseTexture.scene)
 
-    // Point light
-    // const bulbGeometry = new THREE.SphereGeometry(0.02, 16, 8);
-    // let bulbLight = new THREE.PointLight(0xffee88, 1, 100, 2);
 
-    // let bulbMat = new THREE.MeshStandardMaterial({
-    //   emissive: 0xffffee,
-    //   emissiveIntensity: 1,
-    //   color: 0x000000,
-    // });
-    // bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
-    // bulbLight.position.set(0, 2, 0);
-    // bulbLight.castShadow = true;
-    // this.scene.add(bulbLight);
 
-    // Ambient light
-    const ambientLight = new THREE.AmbientLight();
-    ambientLight.color = new THREE.Color(0xffffff);
-    ambientLight.intensity = 0.5;
-    ambientLight.position.set(2, 2, -2);
-    this.scene.add(ambientLight);
+    const ambient = new THREE.AmbientLight( 0xffffff, 0.1 );
+    this.scene.add( ambient );
 
-    // Directional light
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(2, 2, -2);
-    this.scene.add(directionalLight);
+    
+    this.spotLight.position.set( 15, 40, 35 );
+    this.spotLight.angle = Math.PI / 4;
+    this.spotLight.penumbra = 0.1;
+    this.spotLight.decay = 2;
+    this.spotLight.distance = 200;
 
-    // Light helper
-    const directionalLightHelper = new THREE.DirectionalLightHelper(
-      directionalLight,
-      0.2
-    );
-    this.scene.add(directionalLightHelper);
+    this.spotLight.castShadow = true;
+    this.spotLight.shadow.mapSize.width = 512;
+    this.spotLight.shadow.mapSize.height = 512;
+    this.spotLight.shadow.camera.near = 10;
+    this.spotLight.shadow.camera.far = 200;
+    this.spotLight.shadow.focus = 1;
+    this.scene.add( this.spotLight );
 
-    // Spot light
-    const spotLight = new THREE.SpotLight(
-      0xffffff,
-      10,
-      100,
-      Math.PI * 0.2,
-      0.25,
-      1
-    );
-    spotLight.position.set(-2, 2, -2);
-    this.scene.add(spotLight);
+    
+    this.scene.add( this.lightHelper );
 
-    spotLight.target.position.x = -0.75;
-    this.scene.add(spotLight.target);
+    
+    this.scene.add( this.shadowCameraHelper );
 
-    // light helper
-    // const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-    // this.scene.add(spotLightHelper);
+    //
+    let material = new THREE.MeshPhongMaterial( { color: 0x808080, dithering: true } );
 
-    // Light
-    this.scene.add( new THREE.AmbientLight( 0xf0f0f0 ) );
-    const light = new THREE.SpotLight( 0xffffff, 1.5 );
-    light.position.set( 0, 1500, 200 );
-    light.angle = Math.PI * 0.2;
-    light.castShadow = true;
-    light.shadow.camera.near = 200;
-    light.shadow.camera.far = 2000;
-    light.shadow.bias = - 0.000222;
-    light.shadow.mapSize.width = 1024;
-    light.shadow.mapSize.height = 1024;
-    this.scene.add( light );
+    let geometry = new THREE.PlaneGeometry( 2000, 2000 );
+
+    let mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set( 0, - 1, 0 );
+    mesh.rotation.x = - Math.PI * 0.5;
+    mesh.receiveShadow = true;
+    this.scene.add( mesh );
+
+    //
+
+    material = new THREE.MeshPhongMaterial( { color: 0x4080ff, dithering: true } );
+
+    geometry = new THREE.CylinderGeometry( 5, 5, 2, 32, 1, false );
+
+    mesh = new THREE.Mesh( geometry, material );
+    mesh.position.set( 0, 5, 0 );
+    mesh.castShadow = true;
+    this.scene.add( mesh );
+
+
+
+
+
+
 
     // Helper
-    const helper = new THREE.GridHelper(20, 20);
-    helper.position.y = - 5;
-    helper.material.opacity = 1;
-    helper.material.transparent = true;
-    this.scene.add( helper );
+    this.scene.add( new THREE.AxesHelper( 30 ) );
 
-    // Floor plane
-    const planeGeometry = new THREE.PlaneGeometry( 200, 200 );
-    planeGeometry.rotateX( - Math.PI / 2 );
-    const planeMaterial = new THREE.ShadowMaterial( { color: 0xffffff, opacity: 1 } );
-    const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-    plane.position.y = -1;
+    // Ground
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry( 1000, 1000 ),
+      new THREE.MeshPhongMaterial( { color: 0xffffff, depthWrite: true } )
+    );
+    // plane.position.set(0, 0, 0);
+    plane.rotation.x = - Math.PI / 2;
+    plane.position.y = - 0.5;
     plane.receiveShadow = true;
-		this.scene.add(plane);
+    this.scene.add(plane);
+
+    // Scene custom
+		this.scene.background = new THREE.Color( 0xa0a0a0 );
+    this.scene.fog = new THREE.Fog( 0xa0a0a0, 5, 300 );
 
     // UIDebug
     const gui = new GUI();
@@ -150,13 +122,35 @@ export default class World {
     gui.add( this.controlObject, 'height', 0.03, 6 ).onChange( v => { this.onchangeGUI() });
     gui.add( this.controlObject, 'depth', 0.03, 6 ).onChange( v => { this.onchangeGUI() });
 
-    gui.add( this.tapMesh.position, 'x', -6, 6 );
-    gui.add( this.tapMesh.position, 'y', -6, 6 );
-    gui.add( this.tapMesh.position, 'z', -6, 6 );
-    
-    // console.log(this.scene.add(gui));
-    // setTimeout(function(){this.scene.add(gui);},1000);
-    
+    // gui.add( this.tapMesh.position, 'x', -6, 6 );
+    // gui.add( this.tapMesh.position, 'y', -6, 6 );
+    // gui.add( this.tapMesh.position, 'z', -6, 6 );
+  }
+
+  addShadowedLight( x, y, z, color, intensity ) {
+    const directionalLight = new THREE.DirectionalLight( color, intensity );
+    directionalLight.position.set( x, y, z );
+    this.scene.add( directionalLight );
+
+    directionalLight.castShadow = true;
+
+    const d = 1;
+    directionalLight.shadow.camera.left = - d;
+    directionalLight.shadow.camera.right = d;
+    directionalLight.shadow.camera.top = d;
+    directionalLight.shadow.camera.bottom = - d;
+
+    directionalLight.shadow.camera.near = 1;
+    directionalLight.shadow.camera.far = 4;
+
+    directionalLight.shadow.bias = - 0.002;
+
+    // Directional Light Helper
+    const directionalLightHelper = new THREE.DirectionalLightHelper(
+      directionalLight,
+      0.2
+    );
+    this.scene.add(directionalLightHelper);
   }
 
   onchangeSide(v) 
@@ -201,6 +195,9 @@ export default class World {
       "side=''" + this.controlObject.side + "'" +
       "></item>";
     }
+
+		this.lightHelper.update();
+		this.shadowCameraHelper.update();
   }
 
   destroy() {}

@@ -43,13 +43,19 @@ export default class Renderer {
     this.instance.setSize(this.config.width, this.config.height);
     this.instance.setPixelRatio(this.config.pixelRatio);
 
-    this.instance.physicallyCorrectLights = true;
+    // Original settings
+    // this.instance.physicallyCorrectLights = true;
     // this.instance.gammaOutPut = true
-    this.instance.outputEncoding = THREE.sRGBEncoding;
+    // this.instance.outputEncoding = THREE.sRGBEncoding;
     // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-    // this.instance.shadowMap.enabled = false
-    this.instance.toneMapping = THREE.NoToneMapping;
-    this.instance.toneMappingExposure = 1;
+    // this.instance.shadowMap.enabled = true
+    // this.instance.toneMapping = THREE.NoToneMapping;
+    // this.instance.toneMappingExposure = 1;
+
+    // Custom Settings
+    this.instance.shadowMap.enabled = true;
+    this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.instance.outputEncoding = THREE.sRGBEncoding;
 
     this.context = this.instance.getContext();
 
