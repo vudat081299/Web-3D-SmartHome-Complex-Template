@@ -48,13 +48,13 @@ export default class Renderer {
     // this.instance.gammaOutPut = true
     // this.instance.outputEncoding = THREE.sRGBEncoding;
     // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
-    // this.instance.shadowMap.enabled = true
+    this.instance.shadowMap.enabled = true
     // this.instance.toneMapping = THREE.NoToneMapping;
     // this.instance.toneMappingExposure = 1;
 
     // Custom Settings
-    this.instance.shadowMap.enabled = true;
-    this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    // this.instance.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.instance.shadowMap.type = THREE.VSMShadowMap;
     this.instance.outputEncoding = THREE.sRGBEncoding;
 
     this.context = this.instance.getContext();

@@ -44,7 +44,7 @@ export default class Camera {
     this.modes.debug = {};
     this.modes.debug.instance = this.instance.clone();
     this.modes.debug.instance.rotation.reorder("YXZ");
-    this.modes.debug.instance.position.set(5, 5, 5);
+    this.modes.debug.instance.position.set(25, 25, 25);
 
     this.modes.debug.orbitControls = new OrbitControls(
       this.modes.debug.instance,
@@ -54,7 +54,7 @@ export default class Camera {
     this.modes.debug.orbitControls.screenSpacePanning = true;
     this.modes.debug.orbitControls.enableKeys = false;
     this.modes.debug.orbitControls.zoomSpeed = 0.25;
-    this.modes.debug.orbitControls.enableDamping = true;
+    // this.modes.debug.orbitControls.enableDamping = true;
     this.modes.debug.orbitControls.maxPolarAngle = Math.PI * 0.45;
     // this.modes.debug.orbitControls.minPolarAngle = Math.PI * 0.1;
     this.modes.debug.orbitControls.update();
