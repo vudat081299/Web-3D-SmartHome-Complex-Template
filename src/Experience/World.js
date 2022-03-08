@@ -26,6 +26,36 @@ export default class World {
     document.addEventListener('click', () => {
       this.updateIntersectionsOnClick();
     })
+    
+    const onClickButton = (event) => {
+      if (event.target.id === 'delete') {
+        console.log(event.target.id);
+        this.deleteButton();
+      }
+      if (event.target.id === 'add') {
+        console.log(event.target.id);
+        this.addButton();
+      }
+    }
+    window.addEventListener('click', onClickButton);
+  }
+
+  deleteButton() {
+
+  }
+
+  addButton() {
+    let button = {
+      name: 'custom button name',
+      side: 0,
+      x: 0,
+      y: 20,
+      z: - 20,
+      width: 1,
+      height: 1,
+      depth: 1
+    };
+    this.buttons.push(button);
   }
 
   prepareVariables() {
@@ -35,14 +65,28 @@ export default class World {
     this.shadowCameraHelper = new THREE.CameraHelper(this.spotLight.shadow.camera); // call after init spotLight
     this.lightHelper = new THREE.SpotLightHelper(this.spotLight); // call after init spotLight
     this.pointer = new THREE.Vector2();
-    this.buttons = []
-		this.offset = new THREE.Vector3( 0.1, 0.1, 0.1 );
+    let button = {
+      name: 'custom button name',
+      side: 0,
+      x: 0,
+      y: 50,
+      z: - 20,
+      width: 1,
+      height: 1,
+      depth: 1
+    };
+    this.buttons = [button, button];
+    this.buttonObjects = [];
+    // this.buttons.push(button);
+    // this.buttons.push(button);
+    this.offset = new THREE.Vector3( 0.1, 0.1, 0.1 );
   }
 
   setDummy() {
-    // this.prepareModels();
+    this.prepareModels();
     this.prepareLights();
     this.prepareObjects();
+    this.prepareConfigureButton();
     this.prepareGUI();
 
     // Axes helper
@@ -51,6 +95,28 @@ export default class World {
     // Scene custom
     this.scene.background = new THREE.Color(0xa0a0a0);
     this.scene.fog = new THREE.Fog(0xa0a0a0, 5, 300);
+  }
+
+  prepareConfigureButton() {
+    this.buttonObjects.forEach(element => {
+      element.removeFromParent();
+    });
+    this.buttonObjects = [];
+    
+    for (let i = 0; i < this.buttons.length; i++) {
+      let button = this.buttons[i];
+      const geometry = new THREE.BoxGeometry(button.width, button.height, button.depth);
+      const buttonObject = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: 0x99c0ff }));
+      buttonObject.position.x = button.x;
+      buttonObject.position.y = button.y;
+      buttonObject.position.z = button.z;
+      buttonObject.tag = i;
+      buttonObject.name = button.name;
+      buttonObject.side = button.side;
+      buttonObject.castShadow = true;
+      this.buttonObjects.push(buttonObject);
+      this.scene.add(buttonObject);
+    }
   }
 
   prepareObjects() {
@@ -83,15 +149,35 @@ export default class World {
     this.ground = plane;
     this.scene.add(this.ground);
 
-    // Highlight box
     this.highlightBox = new THREE.Mesh(
       new THREE.BoxGeometry(),
       new THREE.MeshLambertMaterial({ color: 0xff9999 })
     );
-    this.highlightBox.visible = false;
-    this.scene.add( this.highlightBox );
 
-    this.prepareIntersections();
+    // this.prepareIntersections();
+  }
+
+  prepareIntersections() {
+    // container = document.createElement('div');
+    // document.body.appendChild(container);
+    const intersectionBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+    for (let i = 0; i < 1000; i++) {
+      const object = new THREE.Mesh(intersectionBoxGeometry, new THREE.MeshLambertMaterial({ color: 0x99c0ff }));
+
+      object.position.x = Math.random() * 100 + 10;
+      object.position.y = Math.random() * 100 + 10;
+      object.position.z = Math.random() * 100 + 10;
+
+      // object.rotation.x = Math.random() * 2 * Math.PI;
+      // object.rotation.y = Math.random() * 2 * Math.PI;
+      // object.rotation.z = Math.random() * 2 * Math.PI;
+
+      // object.scale.x = Math.random() * 1 + 10;
+      // object.scale.y = Math.random() * 1 + 10;
+      // object.scale.z = Math.random() * 1 + 10;
+
+      this.scene.add(object);
+    }
   }
 
   prepareLights() {
@@ -138,8 +224,12 @@ export default class World {
   prepareGUI() {
     // Data binding to gui
     this.controlObject = {
-      enable: false,
+      tag: 0,
+      name: '',
       side: 0,
+      x: 0,
+      y: 0,
+      z: 0,
       width: 1,
       height: 1,
       depth: 1
@@ -149,42 +239,28 @@ export default class World {
     // const gui = new GUI({ closed: true, width: 350 });
     gui.domElement.id = "gui";
 
-    gui.add(this.controlObject, "enable");
-    // gui.add( this.controlObject, 'side', [ 0, 1, 2 ] ).onChange( this.onchangeGUI() );
-    // gui.add( this.controlObject, 'width', 0.1, 10 ).onChange( this.onchangeGUI() );
-    // gui.add( this.controlObject, 'height', 0.1, 10 ).onChange( this.onchangeGUI() );
-    // gui.add( this.controlObject, 'depth', 0.1, 10 ).onChange( this.onchangeGUI() );
-    gui.add(this.controlObject, 'side', [0, 1, 2]).onChange(v => { this.onchangeSide(v); this.onchangeGUI(); });
-    gui.add(this.controlObject, 'width', 0.03, 6).onChange(v => { this.onchangeGUI() });
-    gui.add(this.controlObject, 'height', 0.03, 6).onChange(v => { this.onchangeGUI() });
-    gui.add(this.controlObject, 'depth', 0.03, 6).onChange(v => { this.onchangeGUI() });
-
-    // gui.add( this.tapMesh.position, 'x', -6, 6 );
-    // gui.add( this.tapMesh.position, 'y', -6, 6 );
-    // gui.add( this.tapMesh.position, 'z', -6, 6 );
+    gui.add(this.controlObject, 'side', [0, 1, 2]).onChange(v => { this.onchangeSide(v); this.onchangeGUI(this.controlObject); });
+    gui.add(this.controlObject, 'x', -100, 100 ).onChange(v => { this.onchangeGUI(this.controlObject) });
+    gui.add(this.controlObject, 'y', -100, 100 ).onChange(v => { this.onchangeGUI(this.controlObject) });
+    gui.add(this.controlObject, 'z', -100, 100 ).onChange(v => { this.onchangeGUI(this.controlObject) });
+    gui.add(this.controlObject, 'width', 0.1, 6).onChange(v => { this.onchangeGUI(this.controlObject) });
+    gui.add(this.controlObject, 'height', 0.1, 6).onChange(v => { this.onchangeGUI(this.controlObject) });
+    gui.add(this.controlObject, 'depth', 0.1, 6).onChange(v => { this.onchangeGUI(this.controlObject) });
   }
 
-  prepareIntersections() {
-    // container = document.createElement('div');
-    // document.body.appendChild(container);
-    const intersectionBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
-    for (let i = 0; i < 1000; i++) {
-      const object = new THREE.Mesh(intersectionBoxGeometry, new THREE.MeshLambertMaterial({ color: 0x99c0ff }));
-
-      object.position.x = Math.random() * 100 + 10;
-      object.position.y = Math.random() * 100 + 10;
-      object.position.z = Math.random() * 100 + 10;
-
-      // object.rotation.x = Math.random() * 2 * Math.PI;
-      // object.rotation.y = Math.random() * 2 * Math.PI;
-      // object.rotation.z = Math.random() * 2 * Math.PI;
-
-      // object.scale.x = Math.random() * 1 + 10;
-      // object.scale.y = Math.random() * 1 + 10;
-      // object.scale.z = Math.random() * 1 + 10;
-
-      this.scene.add(object);
-    }
+  onchangeGUI(controlObject) {
+    console.log(controlObject);
+    this.buttons[controlObject.tag] = {
+      name: controlObject.name,
+      side: controlObject.side,
+      x: controlObject.x,
+      y: controlObject.y,
+      z: controlObject.z,
+      width: controlObject.width,
+      height: controlObject.height,
+      depth: controlObject.depth
+    };
+    this.prepareConfigureButton();
   }
 
   addShadowedLight(x, y, z, color, intensity) {
@@ -229,14 +305,6 @@ export default class World {
     }
   }
 
-  onchangeGUI() {
-    this.tapMesh.scale.set(
-      this.controlObject.width,
-      this.controlObject.height,
-      this.controlObject.depth
-    );
-  }
-
   updateIntersectionsOnClick() {
     // find intersections
     this.raycaster = new THREE.Raycaster();
@@ -250,16 +318,51 @@ export default class World {
         if (this.INTERSECTED.material.emissive) {
           // INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
           // this.INTERSECTED.material.emissive.setHex(0x666666);
-          this.highlightBox.position.copy( this.INTERSECTED.position );
-          this.highlightBox.rotation.copy( this.INTERSECTED.rotation );
-          this.highlightBox.scale.copy( this.INTERSECTED.scale ).add( this.offset );
-          this.highlightBox.visible = true;
+          this.showHighlightBox(true);
+          console.log(this.INTERSECTED);
+          if (this.INTERSECTED.tag != null) { 
+            this.updateBindingObject(this.INTERSECTED);
+          }
         }
       }
     } else {
       // if (INTERSECTED.material.emissive) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
       // INTERSECTED = null;
-      this.highlightBox.visible = false;
+      this.showHighlightBox(false);
+    }
+  }
+
+  updateBindingObject(INTERSECTED) {
+    this.controlObject.tag = INTERSECTED.tag
+    this.controlObject.name = INTERSECTED.name
+    this.controlObject.side = INTERSECTED.side
+    this.controlObject.x = INTERSECTED.position.x
+    this.controlObject.y = INTERSECTED.position.y
+    this.controlObject.z = INTERSECTED.position.z
+    this.controlObject.width = INTERSECTED.geometry.parameters.width
+    this.controlObject.height = INTERSECTED.geometry.parameters.height
+    this.controlObject.depth = INTERSECTED.geometry.parameters.depth
+  }
+
+  showHighlightBox(visible) {
+    if (visible) {
+      // Highlight box
+      this.highlightBox.removeFromParent();
+      this.highlightBox = new THREE.Mesh(
+        new THREE.BoxGeometry(
+          this.INTERSECTED.geometry.parameters.width + 0.01,
+          this.INTERSECTED.geometry.parameters.height + 0.01,
+          this.INTERSECTED.geometry.parameters.depth + 0.01
+        ),
+        new THREE.MeshLambertMaterial({ color: 0xff9999 })
+      );
+      this.scene.add(this.highlightBox);
+      this.highlightBox.position.copy(this.INTERSECTED.position);
+      // this.highlightBox.rotation.copy( this.INTERSECTED.rotation );
+      // this.highlightBox.scale.copy(this.INTERSECTED.scale).add(this.offset);
+      this.highlightBox.visible = visible;
+    } else {
+      this.highlightBox.visible = visible;
     }
   }
 
@@ -291,3 +394,4 @@ export default class World {
     
   }
 }
+
